@@ -12,7 +12,14 @@ const serverError = (res) => {
    .json({message: "Internal Server Error"})
 }
 
+const unprocessableEntityError = (res) => {
+   res
+   .status(httpStatus.StatusCodes.UNPROCESSABLE_ENTITY)
+   .json({message: "Fields are missing"})
+}
+
 module.exports = {
    notFoundError,
-   serverError
+   serverError,
+   unprocessableEntityError
 };
