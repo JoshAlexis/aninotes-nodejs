@@ -14,12 +14,28 @@ const allFieldExists = (obj, type) => {
             return false
          } 
          break;
-   
+      case 3:
+         if(obj.hasOwnProperty('Name') && obj.hasOwnProperty('Viewed')
+         && obj.hasOwnProperty('Description') && obj.hasOwnProperty('Comments')
+         && obj.hasOwnProperty('Link')){
+            return true
+         } else{
+            return false
+         }
+         break;
       default:
          break;
    }
 }
+/**
+ * 
+ * @param {String} query 
+ */
+const cleanEscapedSpaces = (query) => {
+   if(!query) return query.replace('%20', ' ')
+}
 
 module.exports = {
-   allFieldExists
+   allFieldExists,
+   cleanEscapedSpaces
 };
