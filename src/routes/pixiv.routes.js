@@ -2,14 +2,16 @@ const express = require('express'),
 router = express.Router(),
 mysqlConnection = require('../database'),
 httpStatus = require('http-status-codes'),
-errorHandler = require('../errorHandling')
+errorHandler = require('../errorHandling'),
+utils = require('../utils'),
+queries = require('../queryStrings')
 
 router.get('/', (req, res) => {
    res.json({ message: "Pixiv API!" })
 })
 
 router.get('/all', (req, res) => {
-   mysqlConnection.query("SELECT * FROM pixiv", (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_ALL_DATA_PIXIV, (err, rows, fields) => {
       if (!err) {
          res
          .status(httpStatus.StatusCodes.OK)
@@ -22,7 +24,7 @@ router.get('/all', (req, res) => {
 })
 
 router.get('/last', (req, res) => {
-   mysqlConnection.query("SELECT * FROM pixiv ORDER BY Id DESC LIMIT 1", (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_LAST_ENTRY_PIXIV, (err, rows, fields) => {
       if (!err) {
          res
          .status(httpStatus.StatusCodes.OK)
@@ -36,7 +38,7 @@ router.get('/last', (req, res) => {
 
 router.get('/:idPixiv', (req, res) => {
    const idPixiv = req.params.idPixiv
-   mysqlConnection.query("SELECT * FROM pixiv WHERE idPixiv = ? OR WHERE Id = ?", [idPixiv], (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_BY_ID_PIXIV, [idPixiv, idPixiv], (err, rows, fields) => {
       if (!err) {
          res
          .status(httpStatus.StatusCodes.OK)
@@ -49,39 +51,49 @@ router.get('/:idPixiv', (req, res) => {
 })
 
 router.post('/add', (req, res) => {
-   const { idPixiv, pixivName, Content, Quality, Favorite, Link } = req.body
-   const newItem = {
-      idPixiv,
-      pixivName,
-      Content,
-      Quality,
-      Favorite,
-      Link
-   }
-   mysqlConnection.query(`INSERT INTO pixiv 
-   (idPixiv,pixivName,Content,Quality,Favorite,Link)
-   VALUES (?,?,?,?,?,?)`, [newItem], (err, rows, fields) => {
-      if (!err) {
-         res
-         .status(httpStatus.StatusCodes.OK)
-         .json({ message: "Data Added Successfully" })
-      } else {
-         if (err.code === 'ER_DUP_ENTRY') {
+
+   if(utils.allFieldExists(req.body, 1)){
+      const { idPixiv, pixivName, Content, Quality, Favorite, Link } = req.body
+      mysqlConnection.query(queries.ADD_NEW_ENTRY_PIXIV, [idPixiv, pixivName, Content, Quality, Favorite, Link], (err, rows, fields) => {
+         if (!err) {
             res
-            .status(httpStatus.StatusCodes.OK)
-            .json({ message: "Duplicated entry" })
-            return
+            .status(httpStatus.StatusCodes.CREATED)
+            .json({ message: "Data Added Successfully" })
+         } else {
+            if (err.code === 'ER_DUP_ENTRY') {
+               res
+               .status(httpStatus.StatusCodes.OK)
+               .json({ message: "Duplicated register" })
+               return
+            }
+            errorHandler.serverError(res)
+            console.error(err)
          }
-         errorHandler.serverError(res)
-         console.error(err)
-      }
-   })
+      })
+   }else{
+      errorHandler.unprocessableEntityError(res)
+   }
 
 })
 
-router.put('/:idPixiv', (req, res) => {
-   mysqlConnection.query(`UPDATE pixiv SET idPixiv = ?,
-   pixivName = ?, Content = ?, Favorite = ?, Link = ? WHERE id`)
+router.put('/update/:id', (req, res) => {
+   if(utils.allFieldExists(req.body,1)){
+      const {idPixiv, pixivName, Content, Quality, Favorite, Link } = req.body
+      const id = req.params.id
+      mysqlConnection.query(queries.UPDATE_PIXIV,
+      [idPixiv, pixivName, Content, Quality, Favorite, Link, id],
+      (err, rows, fields) => {
+         if(!err){
+            res
+            .status(httpStatus.StatusCodes.OK)
+            .json({ message: "Data Updated Successfully" })
+         }else{
+            errorHandler.serverError(res)
+         }
+      })
+   }else{
+      errorHandler.unprocessableEntityError(res)
+   }
 })
 
 
