@@ -14,6 +14,14 @@ const allFieldExists = (obj, type) => {
             return false
          } 
          break;
+      case 2:
+         if(obj.hasOwnProperty('Name') && obj.hasOwnProperty('Source')
+         && obj.hasOwnProperty('Content') && obj.hasOwnProperty('Comments')){
+            return true
+         } else{
+            return false
+         }
+         break;
       case 3:
          if(obj.hasOwnProperty('Name') && obj.hasOwnProperty('Viewed')
          && obj.hasOwnProperty('Description') && obj.hasOwnProperty('Comments')
@@ -27,15 +35,7 @@ const allFieldExists = (obj, type) => {
          break;
    }
 }
-/**
- * 
- * @param {String} query 
- */
-const cleanEscapedSpaces = (query) => {
-   if(!query) return query.replace('%20', ' ')
-}
 
 module.exports = {
-   allFieldExists,
-   cleanEscapedSpaces
+   allFieldExists
 };
