@@ -7,11 +7,11 @@ utils = require('../utils'),
 queries = require('../queryStrings')
 
 router.get('/', (req, res) => {
-   res.json({message: "Illustrators API"})
+   res.json({message: 'Sauces API!'})
 })
 
 router.get('/all', (req, res) => {
-   mysqlConnection.query(queries.GET_ALL_DATA_ILLUSTRATORS, (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_ALL_DATA_SAUCE, (err, rows, fields) => {
       if(!err){
          res
          .status(httpStatus.StatusCodes.OK)
@@ -23,9 +23,9 @@ router.get('/all', (req, res) => {
    })
 })
 
-router.get('/:id', (req, res) => {
+router.get('/:id', (req, res ) => {
    const id = req.params.id
-   mysqlConnection.query(queries.GET_BY_ID_ILLUSTRATOR, [id], (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_BY_ID_SAUCE, [id], (err, rows, fields) => {
       if(!err){
          res
          .status(httpStatus.StatusCodes.OK)
@@ -39,21 +39,7 @@ router.get('/:id', (req, res) => {
 
 router.get('/name/:name', (req, res) => {
    const name = req.params.name
-   mysqlConnection.query(queries.GET_BY_NAME_ILLUSTRATOR, ['%'+name+'%'], (err, rows, fields) => {
-      if(!err){
-         res
-         .status(httpStatus.StatusCodes.OK)
-         .json(rows)
-      }else{
-         errorHandler.serverError(res)
-         console.error(err);
-      }
-   })
-})
-
-router.get('/source/:source', (req, res) => {
-   const source = req.params.source
-   mysqlConnection.query(queries.GET_BY_SOURCE_ILLUSTRATOR, ['%'+source+'%'], (err, rows, fields) => {
+   mysqlConnection.query(queries.GET_BY_NAME_SAUCE, ['%'+name+'%'], (err, rows, fields) => {
       if(!err){
          res
          .status(httpStatus.StatusCodes.OK)
@@ -66,13 +52,13 @@ router.get('/source/:source', (req, res) => {
 })
 
 router.post('/add', (req, res) => {
-   if(utils.allFieldExists(req.body, 2)){
-      const { Name, Source, Content, Comments } = req.body
-      mysqlConnection.query(queries.ADD_ILLUSTRATOR, [Name, Source, Content, Comments], (err, rows, fields) => {
+   if(utils.allFieldExists(req.body, 3)){
+      const {Name, Viewed, Description, Comments, Link} = req.body
+      mysqlConnection.query(queries.ADD_NEW_SAUCE, [Name, Viewed, Description, Comments, Link], (err, rows, fields) => {
          if(!err){
             res
-            .status(httpStatus.StatusCodes.OK)
-            .json({message: "Data Added Succesfully"})
+            .status(httpStatus.StatusCodes.CREATED)
+            .json({message: 'Data Added Successfully'})
          }else{
             errorHandler.serverError(res)
             console.error(err);
@@ -84,31 +70,32 @@ router.post('/add', (req, res) => {
 })
 
 router.put('/update/:id', (req, res) => {
-   if(utils.allFieldExists(req.body, 2)){
-      const { Name, Source, Content, Comments } = req.body
+   if(utils.allFieldExists(req.body, 3)){
+      const {Name, Viewed, Description, Comments, Link} = req.body
       const id = req.params.id
-      mysqlConnection.query(queries.UPDATE_ILLUSTRATOR, [Name, Source, Content, Comments, id], (err, rows, fields) => {
+      mysqlConnection.query(queries.UPDATE_SAUCE, [Name, Viewed, Description, Comments, Link, id], (err, rows, fields) => {
          if(!err){
             res
             .status(httpStatus.StatusCodes.OK)
-            .json({message: "Data Updated Succesfully"})
+            .json({message: "Data Update Successfully"})
          }else{
             errorHandler.serverError(res)
             console.error(err);
          }
       })
    }else{
-      errorHandler.unprocessableEntityError(res)
+      errorHandler.serverError(res)
+      console.error(err);
    }
 })
 
 router.delete('/delete/:id', (req, res) => {
    const id = req.params.id
-   mysqlConnection.query(queries.DELETE_ILLUSTRATOR, [id], (err, rows, fields) => {
+   mysqlConnection.query(queries.DELETE_SAUCE, [id], (err, rows, fields) => {
       if(!err){
          res
          .status(httpStatus.StatusCodes.OK)
-         .json({message: "Data Deleted Succesfully"})
+         .json({message: "Data Deleted Successfully"})
       }else{
          errorHandler.serverError(res)
          console.error(err);
