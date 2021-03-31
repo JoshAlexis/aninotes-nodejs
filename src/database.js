@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
-mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+mongoose.connect(process.env.MONGO_CONNECTION_STRING, {
+  dbName: process.env.MONGO_DATABASE,
+  user: process.env.MONGO_DB_USER,
+  pass: process.env.MONGO_DB_PASSWORD,
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useCreateIndex: true,
