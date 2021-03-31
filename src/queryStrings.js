@@ -1,5 +1,0 @@
-exports.GET_ALL_DATA_PIXIV = "SELECT * FROM pixiv"
-exports.GET_LAST_ENTRY_PIXIV = "SELECT * FROM pixiv ORDER BY Id DESC LIMIT 1"
-exports.GET_BY_ID_PIXIV = "SELECT * FROM pixiv WHERE idPixiv = ? OR Id = ?"
-exports.ADD_NEW_ENTRY_PIXIV = "INSERT INTO pixiv (idPixiv,pixivName,Content,Quality,Favorite,Link) VALUES (?,?,?,?,?,?)"
-exports.UPDATE_PIXIV = "UPDATE pixiv SET idPixiv = ?,pixivName = ?, Content = ?,  Quality = ?, Favorite = ?, Link = ? WHERE Id = ?"

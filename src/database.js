@@ -1,19 +1,13 @@
-const mysql = require('mysql')
+const mongoose = require('mongoose');
 
-const connection =  mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'aninotes'
+mongoose.connect(process.env.MONGODB_CONNECTION_STRING, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
 })
+  .then(() => console.log('Database is connected'))
+  .catch((err) => console.log(err));
 
-connection.connect((error) => {
-    if(error){
-        console.log(error);
-        return;
-    }else{
-        console.log('DB is connected');
-    }
-})
-
-module.exports = connection
+mongoose.connection.on('disconnected', () => {
+  console.log('Database is disconnected');
+});
