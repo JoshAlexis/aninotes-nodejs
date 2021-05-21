@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'test') {
     user: process.env.MONGO_TEST_DB_USER,
     pass: process.env.MONGO_TEST_DB_PASS,
     useNewUrlParser: true,
-    useUnifiedTopology: true,
+    useUnifiedTopology: false,
     useCreateIndex: true,
   };
 } else {
@@ -19,7 +19,6 @@ if (process.env.NODE_ENV === 'test') {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
-    useFindAndModify: false,
   };
 }
 

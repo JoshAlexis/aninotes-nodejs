@@ -1,4 +1,5 @@
 const createErrors = require('http-errors');
+const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
 const Pixiv = require('../models/pixivModel');
 const { pixivSchema, pixivContent } = require('../utils/validation_schemas');
@@ -108,6 +109,7 @@ class PixivController {
   async updatePixiv(req, res, next) {
     const { id } = req.params;
     try {
+      if (!mongoose.Types.ObjectId.isValid(id)) throw createErrors.BadRequest(`Bad request. ${id} is not a valid param`);
       const result = await pixivSchema.validateAsync(req.body);
       await Pixiv.findByIdAndUpdate(id, result, { new: true });
       return res.status(200).json({ message: 'Pixiv updated' });
