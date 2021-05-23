@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 const pixivApi = require('./routes/pixiv.routes');
 const { notFoundError, errorHandler } = require('./utils/errorHandlers');
 
@@ -9,7 +10,10 @@ const PORT = process.env.PORT || 3000;
 require('./database');
 
 // Config
-app.use(morgan('dev'));
+app.use(cors());
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
@@ -23,6 +27,11 @@ app.get('/', (req, res) => {
 app.use(notFoundError);
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`);
 });
+
+module.exports = {
+  app,
+  server,
+};
