@@ -4,7 +4,6 @@ const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries
 const Pixiv = require('../models/pixivModel');
 const { pixivSchema, pixivContent } = require('../utils/validation_schemas');
 const paginated = require('../utils/paginated');
-const pixivModel = require('../models/pixivModel');
 
 class PixivController {
   async getAll(req, res, next) {
@@ -22,17 +21,7 @@ class PixivController {
       const pixiv = await Pixiv.find().limit(limit).skip(skip);
       const pixivCount = await getTotalDocuments(Pixiv);
 
-      const paginatedOpt = {
-        page,
-        limit,
-        startIndex,
-        endIndex,
-        items: pixiv,
-        total: pixivCount,
-        url: 'pixiv',
-      };
-
-      const results = paginated(paginatedOpt);
+      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv');
       return res.status(200).json(results);
     } catch (error) {
       next(error);
@@ -74,19 +63,9 @@ class PixivController {
 
       const query = { Content: { $regex: content, $options: 'i' } };
       const pixiv = await Pixiv.find(query).limit(limit).skip(skip);
-      const pixivCount = await getCountDocuments(pixivModel, query);
+      const pixivCount = await getCountDocuments(Pixiv, query);
 
-      const paginatedOpt = {
-        page,
-        limit,
-        startIndex,
-        endIndex,
-        items: pixiv,
-        total: pixivCount,
-        url: 'pixiv/content',
-      };
-
-      const results = paginated(paginatedOpt);
+      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv/content');
       return res.status(200).json(results);
     } catch (error) {
       if (error.isJoi === true) error.status = 422;
