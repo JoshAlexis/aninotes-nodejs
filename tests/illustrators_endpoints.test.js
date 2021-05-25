@@ -16,7 +16,7 @@ afterAll(() => {
   mongoose.connection.close();
 });
 
-describe('Illustrators endpoints with 200 status code', () => {
+describe('Illustrators endpoints with 200 status code', async () => {
   it('Get pixiv, should return an object where field \'data\' is not empty', async () => {
     const result = await api.get('/api/illustrators/').query({
       page: 1,
@@ -25,5 +25,18 @@ describe('Illustrators endpoints with 200 status code', () => {
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
     expect(result.body.data).toHaveLength(illustratorsItems.length);
+  });
+
+  it('Get pixiv by Name, should return an object with all fields', async () => {
+    const name = 'DM-iTH';
+    const result = await api.get(`/api/illustrators/name/${name}`)
+      .send({ Name: name });
+
+    expect(result.status).toBe(200);
+    expect(result.headers['content-type']).toMatch(/application\/json/);
+    expect(result.body).toHaveProperty('_id');
+    expect(result.body).toHaveProperty('Name');
+    expect(result.body).toHaveProperty('Source');
+    expect(result.body).toHaveProperty('Comments');
   });
 });

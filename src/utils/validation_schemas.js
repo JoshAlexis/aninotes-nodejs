@@ -14,7 +14,12 @@ const pixivContent = Joi.object().keys({
   Content: Joi.string().required(),
 });
 
+const illustratorName = Joi.object().keys({
+  Name: Joi.string().required(),
+});
+
 module.exports = {
   pixivSchema,
   pixivContent,
+  illustratorName,
 };
