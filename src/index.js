@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const pixivApi = require('./routes/pixiv.routes');
+const illustratorsApi = require('./routes/illustrators.routes');
 const { notFoundError, errorHandler } = require('./utils/errorHandlers');
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.json());
 
 // Setting Routes
 app.use('/api/pixiv', pixivApi);
+app.use('/api/illustrators', illustratorsApi);
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Aninotes API' });
 });
