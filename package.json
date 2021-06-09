@@ -9,10 +9,10 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "NODE_ENV=test jest --verbose --silent --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand",
     "test:watch": "npm run test -- --watch",
-    "test:no-silent": "NODE_ENV=test jest --verbose",
-    "test:open-handles": "NODE_ENV=test jest --verbose --silent --detectOpenHandles"
+    "test:no-silent": "cross-env NODE_ENV=test jest --verbose",
+    "test:open-handles": "cross-env NODE_ENV=test jest --verbose --silent --detectOpenHandles"
   },
   "keywords": [
     "API REST",
@@ -31,8 +31,9 @@
     "npm-check-updates": "^11.5.13"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.14.4",
-    "eslint": "^7.27.0",
+    "@babel/eslint-parser": "^7.13.14",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.23.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.3",
     "jest": "^27.0.1",

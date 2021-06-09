@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const pixivSchema = Joi.object().keys({
-  idPixiv: Joi.string().regex(/[0-1]{1,}/).required(),
+  idPixiv: Joi.string().regex(/[0-9]{1,}/).required(),
   pixivName: Joi.string(),
   Content: Joi.string().required(),
   Quality: Joi.string().regex(/[+]/).min(1).max(4)
@@ -14,7 +14,12 @@ const pixivContent = Joi.object().keys({
   Content: Joi.string().required(),
 });
 
+const illustratorName = Joi.object().keys({
+  Name: Joi.string().required(),
+});
+
 module.exports = {
   pixivSchema,
   pixivContent,
+  illustratorName,
 };

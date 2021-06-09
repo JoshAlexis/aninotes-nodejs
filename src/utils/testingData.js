@@ -94,8 +94,42 @@ const body = {
   Content: 'azur lane',
 };
 
+const illustratorsItems = [
+  {
+    Name: 'DM-iTH',
+    Source: 'Devianart',
+    Content: '',
+    Comments: '',
+  },
+  {
+    Name: 'Hyanna-Natsu',
+    Source: 'Devianart',
+    Content: '',
+    Comments: '',
+  },
+  {
+    Name: 'dishwasher1910',
+    Source: 'Devianart',
+    Content: '',
+    Comments: '',
+  },
+  {
+    Name: 'bekkankou',
+    Source: 'Anime-pictures',
+    Content: '',
+    Comments: '',
+  },
+  {
+    Name: 'Miura N315',
+    Source: 'Artstation',
+    Content: '',
+    Comments: '',
+  },
+];
+
 module.exports = {
   pixivItems,
   newPixiv,
   body,
+  illustratorsItems,
 };

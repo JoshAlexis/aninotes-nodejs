@@ -4,7 +4,6 @@ const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries
 const Pixiv = require('../models/pixivModel');
 const { pixivSchema, pixivContent } = require('../utils/validation_schemas');
 const paginated = require('../utils/paginated');
-const pixivModel = require('../models/pixivModel');
 
 class PixivController {
   async getAll(req, res, next) {
@@ -19,20 +18,10 @@ class PixivController {
       const startIndex = skip;
       const endIndex = page * limit;
 
-      const pixiv = await Pixiv.find().limit(limit).skip(skip);
+      const pixiv = await Pixiv.find().limit(limit).skip(skip).sort({ _id: 'desc' });
       const pixivCount = await getTotalDocuments(Pixiv);
 
-      const paginatedOpt = {
-        page,
-        limit,
-        startIndex,
-        endIndex,
-        items: pixiv,
-        total: pixivCount,
-        url: 'pixiv',
-      };
-
-      const results = paginated(paginatedOpt);
+      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv');
       return res.status(200).json(results);
     } catch (error) {
       next(error);
@@ -43,8 +32,8 @@ class PixivController {
     const { idPixiv } = req.params;
     try {
       if (!Number(idPixiv)) throw createErrors.BadRequest(`Bad Request. '${idPixiv}' is not a valid param`);
-      const pixiv = await Pixiv.findOne({ idPixiv });
-      if (!pixiv) return res.status(200).json({});
+      const pixiv = await Pixiv.find({ idPixiv });
+      if (!pixiv) return res.status(200).json([]);
       return res.status(200).json(pixiv);
     } catch (error) {
       next(error);
@@ -56,7 +45,7 @@ class PixivController {
       const { Content: content } = await pixivContent.validateAsync(req.body);
 
       if (Object.keys(req.query).length === 0) {
-        const pixiv = await Pixiv.find({ Content: { $regex: content, $options: 'i' } });
+        const pixiv = await Pixiv.find({ Content: { $regex: content, $options: 'i' } }).sort({ _id: 'desc' });
 
         if (!pixiv) return res.status(200).json([]);
         return res.status(200).json(pixiv);
@@ -74,19 +63,9 @@ class PixivController {
 
       const query = { Content: { $regex: content, $options: 'i' } };
       const pixiv = await Pixiv.find(query).limit(limit).skip(skip);
-      const pixivCount = await getCountDocuments(pixivModel, query);
+      const pixivCount = await getCountDocuments(Pixiv, query);
 
-      const paginatedOpt = {
-        page,
-        limit,
-        startIndex,
-        endIndex,
-        items: pixiv,
-        total: pixivCount,
-        url: 'pixiv/content',
-      };
-
-      const results = paginated(paginatedOpt);
+      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv/content');
       return res.status(200).json(results);
     } catch (error) {
       if (error.isJoi === true) error.status = 422;
