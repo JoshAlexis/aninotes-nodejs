@@ -6,6 +6,9 @@
   "jest": {
     "testEnvironment": "node"
   },
+  "engines": {
+    "node": "14.15.5"
+  },
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
