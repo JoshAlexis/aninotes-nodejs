@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const logger = require('./utils/logger');
 
 const connectOptions = {
   dbName: null,
@@ -21,9 +22,9 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 mongoose.connect(process.env.MONGO_CONNECTION_URI, connectOptions)
-  .then(() => console.log('Database is connected'))
-  .catch((err) => console.log(err));
+  .then(() => logger.info('Database is connected'))
+  .catch((err) => logger.error(err));
 
 mongoose.connection.on('disconnected', () => {
-  console.log('Database is disconnected');
+  logger.info('Database is disconnected');
 });
