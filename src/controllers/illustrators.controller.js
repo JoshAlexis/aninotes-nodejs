@@ -4,8 +4,9 @@ const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries
 const { illustratorName } = require('../utils/validation_schemas');
 const Illustrators = require('../models/illustratorsModel');
 const paginated = require('../utils/paginated');
+const logger = require('../utils/logger');
 
-class IllustratorsController {
+const IllustratorsController = {
   async getAll(req, res, next) {
     try {
       let { page, limit } = req.query;
@@ -23,10 +24,11 @@ class IllustratorsController {
 
       const results = paginated(page, limit, startIndex, endIndex, illustrators, illustratorsCount, 'illustratos');
       return res.status(200).json(results);
-    } catch (error) {
-      next(error);
+    } catch (err) {
+      logger.error(err);
+      next(err);
     }
-  }
+  },
 
   async getByName(req, res, next) {
     try {
@@ -35,9 +37,10 @@ class IllustratorsController {
       if (!illustrator) return res.status(200).json({});
       return res.status(200).json(illustrator);
     } catch (err) {
+      logger.error(err);
       next(err);
     }
-  }
+  },
 
   async getBySource(req, res, next) {
     const { source } = req.params;
@@ -57,19 +60,18 @@ class IllustratorsController {
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
 
-      const skip = (page - 1) * limit;
-      const startIndex = skip;
+      const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-      const illustratorsItems = await Illustrators.find().limit(limit).skip(skip);
-      const illustratorsCount = await getCountDocuments(Illustrators);
+      const illustratorsItems = await Illustrators.find().limit(limit).skip(skipIndex);
 
-      const results = paginated(page, limit, startIndex, endIndex, illustratorsItems, illustratorsCount, 'illustratos');
+      const results = paginated(page, limit, skipIndex, endIndex, illustratorsItems);
       return res.status(200).json(results);
     } catch (err) {
+      logger.error(err);
       next(err);
     }
-  }
-}
+  },
+};
 
-module.exports = new IllustratorsController();
+module.exports = IllustratorsController;

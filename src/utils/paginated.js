@@ -8,9 +8,8 @@ const { Document } = require('mongoose');
  * @param {number} startIndex - The index of the first element of the page.
  * Also represents the amount to skipped elements.
  * @param {number} endIndex - The index of the last element of the page.
+ * @param {number} total - total amount of documents in the collection
  * @param {Document[]} items - An array of Mongo documents
- * @param {number} total - The amount of documents in the collection.
- * @param {string} url - The base URL to create the URL's for the previous and next page.
  * @returns An object with the structure of a paginated response.
  */
 function paginated(
@@ -18,40 +17,28 @@ function paginated(
   limit,
   startIndex,
   endIndex,
-  items,
   total,
-  url,
+  items,
 ) {
-  const results = {};
-
-  results.total = total;
-  results.isLast = false;
+  const result = {};
 
   if (startIndex > 0) {
-    results.prev = {
+    result.prev = {
       page: page - 1,
-      size: limit,
-      link: `api/${url}/?page=${page - 1}&limit=${limit}`,
+      limit,
     };
-  } else {
-    results.prev = null;
   }
 
-  if (endIndex <= total) {
-    results.next = {
+  if (endIndex < total) {
+    result.next = {
       page: page + 1,
-      size: limit,
-      link: `api/${url}/?page=${page + 1}&limit=${limit}`,
+      limit,
     };
-  } else {
-    results.next = null;
   }
 
-  if (results.next === null) results.isLast = true;
+  result.results = items;
 
-  results.data = items;
-
-  return results;
+  return result;
 }
 
 module.exports = paginated;

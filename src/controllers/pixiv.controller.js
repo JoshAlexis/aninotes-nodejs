@@ -14,14 +14,13 @@ class PixivController {
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
 
-      const skip = (page - 1) * limit;
-      const startIndex = skip;
+      const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-      const pixiv = await Pixiv.find().limit(limit).skip(skip);
+      const pixiv = await Pixiv.find().limit(limit).skip(skipIndex);
       const pixivCount = await getTotalDocuments(Pixiv);
 
-      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv');
+      const results = paginated(page, limit, skipIndex, endIndex, pixivCount, pixiv);
       return res.status(200).json(results);
     } catch (error) {
       next(error);
