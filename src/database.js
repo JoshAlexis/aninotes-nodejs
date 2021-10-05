@@ -1,27 +1,23 @@
 const mongoose = require('mongoose');
 
-let connectOptions = {};
+const connectOptions = {
+  dbName: null,
+  user: null,
+  pass: null,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+};
 
 if (process.env.NODE_ENV === 'test') {
-  connectOptions = {
-    dbName: process.env.MONGO_TEST_DATABASE,
-    user: process.env.MONGO_TEST_DB_USER,
-    pass: process.env.MONGO_TEST_DB_PASS,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  };
+  connectOptions.dbName = process.env.MONGO_TEST_DATABASE;
+  connectOptions.user = process.env.MONGO_TEST_DB_USER;
+  connectOptions.pass = process.env.MONGO_TEST_DB_PASSWORD;
 } else {
-  connectOptions = {
-    dbName: process.env.MONGO_DATABASE,
-    user: process.env.MONGO_DB_USER,
-    pass: process.env.MONGO_DB_PASSWORD,
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  };
+  connectOptions.dbName = process.env.MONGO_DATABASE;
+  connectOptions.user = process.env.MONGO_DB_USER;
+  connectOptions.pass = process.env.MONGO_DB_PASSWORD;
 }
 
 mongoose.connect(process.env.MONGO_CONNECTION_URI, connectOptions)
