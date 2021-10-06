@@ -1,7 +1,7 @@
 const createErrors = require('http-errors');
 const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
-const { illustratorName } = require('../utils/validation_schemas');
+const { illustratorName } = require('../utils/validationSchemas');
 const Illustrators = require('../models/illustratorsModel');
 const paginated = require('../utils/paginated');
 const logger = require('../utils/logger');
@@ -22,7 +22,7 @@ const IllustratorsController = {
       const illustrators = await Illustrators.find().limit(limit).skip(skip);
       const illustratorsCount = await getTotalDocuments(Illustrators);
 
-      const results = paginated(page, limit, startIndex, endIndex, illustrators, illustratorsCount, 'illustratos');
+      const results = paginated(page, limit, startIndex, endIndex, illustratorsCount, illustrators);
       return res.status(200).json(results);
     } catch (err) {
       logger.error(err);
@@ -32,9 +32,10 @@ const IllustratorsController = {
 
   async getByName(req, res, next) {
     try {
-      const { Name } = illustratorName.validateAsync(req.body);
-      const illustrator = await Illustrators.findOne({ Name });
-      if (!illustrator) return res.status(200).json({});
+      const { name } = illustratorName.validateAsync(req.body);
+      const query = { Name: { $regex: name, $options: 'i' } };
+      const illustrator = await Illustrators.find(query);
+      if (!illustrator) return res.status(200).json([]);
       return res.status(200).json(illustrator);
     } catch (err) {
       logger.error(err);

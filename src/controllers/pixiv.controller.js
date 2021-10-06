@@ -2,7 +2,7 @@ const createErrors = require('http-errors');
 const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
 const Pixiv = require('../models/pixivModel');
-const { pixivSchema, pixivContent } = require('../utils/validation_schemas');
+const { pixivSchema, pixivContent } = require('../utils/validationSchemas');
 const paginated = require('../utils/paginated');
 
 class PixivController {
@@ -64,7 +64,7 @@ class PixivController {
       const pixiv = await Pixiv.find(query).limit(limit).skip(skip);
       const pixivCount = await getCountDocuments(Pixiv, query);
 
-      const results = paginated(page, limit, startIndex, endIndex, pixiv, pixivCount, 'pixiv/content');
+      const results = paginated(page, limit, startIndex, endIndex, pixivCount, pixiv);
       return res.status(200).json(results);
     } catch (error) {
       if (error.isJoi === true) error.status = 422;

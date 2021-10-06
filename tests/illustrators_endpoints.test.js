@@ -29,7 +29,7 @@ describe('Illustrators endpoints with 200 status code', async () => {
 
   it('Get pixiv by Name, should return an object with all fields', async () => {
     const name = 'DM-iTH';
-    const result = await api.get(`/api/illustrators/name/${name}`)
+    const result = await api.get('/api/illustrators/name/')
       .send({ Name: name });
 
     expect(result.status).toBe(200);

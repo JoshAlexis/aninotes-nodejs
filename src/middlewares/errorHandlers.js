@@ -1,5 +1,5 @@
 const createError = require('http-errors');
-const logger = require('./logger');
+const logger = require('../utils/logger');
 
 const notFoundError = (req, res, next) => {
   next(createError.NotFound());
@@ -13,7 +13,7 @@ const errorHandler = (err, req, res, next) => {
       message: err.message,
     },
   });
-  logger.error(err);
+  if (process.env.NODE_ENV !== 'test') logger.error(err);
 };
 
 module.exports = {

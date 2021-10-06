@@ -7,8 +7,8 @@
     "testEnvironment": "node"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js",
+    "start": "node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand",
     "test:watch": "npm run test -- --watch",
     "test:no-silent": "cross-env NODE_ENV=test jest --verbose",

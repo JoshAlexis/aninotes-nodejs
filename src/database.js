@@ -14,7 +14,7 @@ const connectOptions = {
 if (process.env.NODE_ENV === 'test') {
   connectOptions.dbName = process.env.MONGO_TEST_DATABASE;
   connectOptions.user = process.env.MONGO_TEST_DB_USER;
-  connectOptions.pass = process.env.MONGO_TEST_DB_PASSWORD;
+  connectOptions.pass = process.env.MONGO_TEST_DB_PASS;
 } else {
   connectOptions.dbName = process.env.MONGO_DATABASE;
   connectOptions.user = process.env.MONGO_DB_USER;
