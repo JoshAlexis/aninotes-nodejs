@@ -1,30 +1,30 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
-const pixivModel = require('../src/models/pixivModel');
-const { pixivItems, newPixiv, body } = require('../src/utils/testingData');
-const { app, server } = require('../src/index');
+const pixivModel = require('../models/pixivModel');
+const { pixivItems, newPixiv, body } = require('../utils/testingData');
+const app = require('../app');
 
 const api = supertest(app);
 
 beforeAll(async () => {
   await pixivModel.deleteMany({});
   await pixivModel.insertMany(pixivItems);
+  jest.setTimeout(10000);
 });
 
-afterAll(() => {
-  server.close();
-  mongoose.connection.close();
+afterAll(async () => {
+  await mongoose.connection.close();
 });
 
 describe('Pixiv endpoints with 200 status code', () => {
-  it('Get pixiv, should return an object where field \'data\' is not empty', async () => {
+  it('Get pixiv, should return an object where field \'results\' is not empty', async () => {
     const result = await api.get('/api/pixiv/').query({
       page: 1,
       limit: 10,
     });
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
-    expect(result.body.data).toHaveLength(pixivItems.length);
+    expect(result.body.results).toHaveLength(pixivItems.length);
   });
 
   it('Create pixiv, should return object with message', async () => {
@@ -44,7 +44,7 @@ describe('Pixiv endpoints with 200 status code', () => {
       expect(result.body).not.toHaveLength(0);
     });
 
-    it('Paginated, should have field \'data\' and return a not empty array', async () => {
+    it('Paginated, should have field \'results\' and return a not empty array', async () => {
       const result = await api.get('/api/pixiv/content/')
         .query({
           page: 1,
@@ -53,8 +53,8 @@ describe('Pixiv endpoints with 200 status code', () => {
         .send(body);
       expect(result.status).toBe(200);
       expect(result.headers['content-type']).toMatch(/application\/json/);
-      expect(result.body).toHaveProperty('data');
-      expect(result.body.data).not.toHaveLength(0);
+      expect(result.body).toHaveProperty('results');
+      expect(result.body.results).not.toHaveLength(0);
     });
   });
 

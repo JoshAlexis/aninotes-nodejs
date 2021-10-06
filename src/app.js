@@ -1,3 +1,4 @@
+if (process.env.NODE_ENV === 'test') global.__basedir = __dirname;
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');

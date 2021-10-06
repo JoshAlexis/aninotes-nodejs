@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
-    "test": "cross-env NODE_ENV=test jest --verbose --silent --runInBand",
+    "test": "cross-env NODE_ENV=test PORT=5500 jest --verbose --silent --runInBand",
     "test:watch": "npm run test -- --watch",
     "test:no-silent": "cross-env NODE_ENV=test jest --verbose",
     "test:open-handles": "cross-env NODE_ENV=test jest --verbose --silent --detectOpenHandles"

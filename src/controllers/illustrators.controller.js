@@ -1,7 +1,7 @@
 const createErrors = require('http-errors');
 const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
-const { illustratorName } = require('../utils/validationSchemas');
+const { illustratorName, illustratorSchema } = require('../utils/validationSchemas');
 const Illustrators = require('../models/illustratorsModel');
 const paginated = require('../utils/paginated');
 const logger = require('../utils/logger');
@@ -25,20 +25,20 @@ const IllustratorsController = {
       const results = paginated(page, limit, startIndex, endIndex, illustratorsCount, illustrators);
       return res.status(200).json(results);
     } catch (err) {
-      logger.error(err);
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
       next(err);
     }
   },
 
   async getByName(req, res, next) {
     try {
-      const { name } = illustratorName.validateAsync(req.body);
-      const query = { Name: { $regex: name, $options: 'i' } };
+      const { Name: name } = await illustratorName.validateAsync(req.body);
+      const query = { Name: { $regex: name } };
       const illustrator = await Illustrators.find(query);
       if (!illustrator) return res.status(200).json([]);
       return res.status(200).json(illustrator);
     } catch (err) {
-      logger.error(err);
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
       next(err);
     }
   },
@@ -69,7 +69,34 @@ const IllustratorsController = {
       const results = paginated(page, limit, skipIndex, endIndex, illustratorsItems);
       return res.status(200).json(results);
     } catch (err) {
-      logger.error(err);
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
+      next(err);
+    }
+  },
+
+  async addIllustrator(req, res, next) {
+    try {
+      const body = await illustratorSchema.validateAsync(req.body);
+      const newIllustrator = Illustrators(body);
+      await newIllustrator.save();
+      return res.status(201).json({ message: 'Illustrator added' });
+    } catch (err) {
+      if (err.isJoi === true) err.status = 422;
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
+      next(err);
+    }
+  },
+
+  async updateIllustrator(req, res, next) {
+    try {
+      const { id } = req.params;
+      if (!mongoose.Types.ObjectId.isValid(id)) throw createErrors.BadRequest(`Bad request. ${id} is not a valid param`);
+      const body = await illustratorSchema.validateAsync(req.body);
+      await Illustrators.findByIdAndUpdate(id, body, { new: true });
+      return res.status(200).json({ message: 'Illustrator updated' });
+    } catch (err) {
+      if (err.isJoi === true) err.status = 422;
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
       next(err);
     }
   },

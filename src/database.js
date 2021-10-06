@@ -11,7 +11,7 @@ const connectOptions = {
   useFindAndModify: false,
 };
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
   connectOptions.dbName = process.env.MONGO_TEST_DATABASE;
   connectOptions.user = process.env.MONGO_TEST_DB_USER;
   connectOptions.pass = process.env.MONGO_TEST_DB_PASS;

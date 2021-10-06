@@ -1,12 +1,11 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
-const { app, server } = require('../src/index');
+const app = require('../app');
 
 const api = supertest(app);
 
-afterAll(() => {
-  mongoose.connection.close();
-  server.close();
+afterAll(async () => {
+  await mongoose.connection.close();
 });
 
 describe('Pixiv Schema validations', () => {
