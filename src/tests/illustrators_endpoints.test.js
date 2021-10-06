@@ -17,7 +17,7 @@ afterAll(async () => {
 });
 
 describe('Illustrators endpoints with 200 status code', async () => {
-  it('Get pixiv, should return an object where field \'results\' is not empty', async () => {
+  it('Get illustrators, should return an object where field \'results\' is not empty', async () => {
     const result = await api.get('/api/illustrators/').query({
       page: 1,
       limit: 10,
@@ -27,17 +27,21 @@ describe('Illustrators endpoints with 200 status code', async () => {
     expect(result.body.results).toHaveLength(illustratorsItems.length);
   });
 
-  it('Get pixiv by Name, should return an object with all fields', async () => {
+  it('Get illustrators by Name, should return an object where field \'results\' is not empty', async () => {
     const name = 'DM-iTH';
     const result = await api.get('/api/illustrators/name/')
+      .query({
+        page: 1,
+        limit: 10,
+      })
       .send({ Name: name });
 
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
-    expect(result.body[0]).toHaveProperty('_id');
-    expect(result.body[0]).toHaveProperty('Name');
-    expect(result.body[0]).toHaveProperty('Source');
-    expect(result.body[0]).toHaveProperty('Comments');
+    expect(result.body.results[0]).toHaveProperty('_id');
+    expect(result.body.results[0]).toHaveProperty('Name');
+    expect(result.body.results[0]).toHaveProperty('Source');
+    expect(result.body.results[0]).toHaveProperty('Comments');
   });
 
   it('Add illustrator, should return an object', async () => {
@@ -57,8 +61,12 @@ describe('Illustrators endpoints with 200 status code', async () => {
       Comments: 'R18',
     };
     const result = await api.get('/api/illustrators/name/')
+      .query({
+        page: 1,
+        limit: 10,
+      })
       .send({ Name: updateIllustrator.Name });
-    const { _id } = result.body[0];
+    const { _id } = result.body.results[0];
     await api
       .put(`/api/illustrators/update/${_id}`)
       .send(updateIllustrator)

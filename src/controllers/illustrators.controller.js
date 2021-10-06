@@ -33,29 +33,8 @@ const IllustratorsController = {
   async getByName(req, res, next) {
     try {
       const { Name: name } = await illustratorName.validateAsync(req.body);
-      const query = { Name: { $regex: name } };
-      const illustrator = await Illustrators.find(query);
-      if (!illustrator) return res.status(200).json([]);
-      return res.status(200).json(illustrator);
-    } catch (err) {
-      if (process.env.NODE_ENV !== 'test') logger.error(err);
-      next(err);
-    }
-  },
-
-  async getBySource(req, res, next) {
-    const { source } = req.params;
-    try {
       let { page, limit } = req.query;
-
-      if (source === '') throw createErrors.BadRequest(`Bad Request. ${source} is not a valid param.`);
-
-      if (Object.keys(req.query).length === 0) {
-        const illustratorsItems = await Illustrators.find({ Source: source });
-
-        if (!illustratorsItems) return res.status(200).json([]);
-        return res.status(200).json(illustratorsItems);
-      }
+      const query = { Name: { $regex: name } };
 
       if (!page || !limit) throw createErrors.BadRequest('Must include query params');
       page = parseInt(page, 10);
@@ -64,9 +43,38 @@ const IllustratorsController = {
       const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-      const illustratorsItems = await Illustrators.find().limit(limit).skip(skipIndex);
+      const illustrators = await Illustrators.find(query).limit(limit).skip(skipIndex);
+      const illustratorCount = await getCountDocuments(Illustrators, query);
+      const results = paginated(page, limit, skipIndex, endIndex,
+        illustratorCount, illustrators);
 
-      const results = paginated(page, limit, skipIndex, endIndex, illustratorsItems);
+      return res.status(200).json(results);
+    } catch (err) {
+      if (process.env.NODE_ENV !== 'test') logger.error(err);
+      next(err);
+    }
+  },
+
+  async getBySource(req, res, next) {
+    try {
+      const { source } = req.params;
+      const query = { Source: source };
+      let { page, limit } = req.query;
+
+      if (source === '') throw createErrors.BadRequest(`Bad Request. ${source} is not a valid param.`);
+
+      if (!page || !limit) throw createErrors.BadRequest('Must include query params');
+      page = parseInt(page, 10);
+      limit = parseInt(limit, 10);
+
+      const skipIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      const illustratorsItems = await Illustrators.find(query).limit(limit).skip(skipIndex);
+      const illustratorsCount = await getCountDocuments(Illustrators, query);
+
+      const results = paginated(page, limit, skipIndex, endIndex, illustratorsCount,
+        illustratorsItems);
       return res.status(200).json(results);
     } catch (err) {
       if (process.env.NODE_ENV !== 'test') logger.error(err);
