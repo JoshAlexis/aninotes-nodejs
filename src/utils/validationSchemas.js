@@ -18,8 +18,16 @@ const illustratorName = Joi.object().keys({
   Name: Joi.string().required(),
 });
 
+const illustratorSchema = Joi.object().keys({
+  Name: Joi.string().required(),
+  Source: Joi.string().required(),
+  Content: Joi.string(),
+  Comments: Joi.string(),
+});
+
 module.exports = {
   pixivSchema,
   pixivContent,
   illustratorName,
+  illustratorSchema,
 };

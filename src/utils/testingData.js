@@ -119,17 +119,19 @@ const illustratorsItems = [
     Content: '',
     Comments: '',
   },
-  {
-    Name: 'Miura N315',
-    Source: 'Artstation',
-    Content: '',
-    Comments: '',
-  },
 ];
+
+const newIllustrator = {
+  Name: 'Miura N315',
+  Source: 'Artstation',
+  Content: 'N/A',
+  Comments: 'N/A',
+};
 
 module.exports = {
   pixivItems,
   newPixiv,
   body,
   illustratorsItems,
+  newIllustrator,
 };
