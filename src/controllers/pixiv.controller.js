@@ -17,11 +17,7 @@ class PixivController {
       const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
 
-<<<<<<< HEAD
-      const pixiv = await Pixiv.find().limit(limit).skip(skip).sort({ _id: 'desc' });
-=======
       const pixiv = await Pixiv.find().limit(limit).skip(skipIndex);
->>>>>>> illustrators
       const pixivCount = await getTotalDocuments(Pixiv);
 
       const results = paginated(page, limit, skipIndex, endIndex, pixivCount, pixiv);
