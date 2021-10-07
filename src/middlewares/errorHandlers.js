@@ -8,10 +8,8 @@ const notFoundError = (req, res, next) => {
 const errorHandler = (err, req, res, next) => {
   res.status(err.status || 500);
   res.json({
-    error: {
-      status: err.status || 500,
-      message: err.message,
-    },
+    status: err.status || 500,
+    message: err.message,
   });
   if (process.env.NODE_ENV !== 'test') logger.error(err);
 };

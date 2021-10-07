@@ -50,7 +50,7 @@ describe('Illustrators endpoints with 200 status code', async () => {
       .send(newIllustrator)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-      .expect({ message: 'Illustrator added' });
+      .expect({ status: 201, message: 'Illustrator added' });
   });
 
   it('Update illustrator, should return an object', async () => {
@@ -72,6 +72,6 @@ describe('Illustrators endpoints with 200 status code', async () => {
       .send(updateIllustrator)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-      .expect({ message: 'Illustrator updated' });
+      .expect({ status: 200, message: 'Illustrator updated' });
   });
 });

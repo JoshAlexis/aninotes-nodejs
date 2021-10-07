@@ -33,29 +33,20 @@ describe('Pixiv endpoints with 200 status code', () => {
       .send(newPixiv)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-      .expect({ message: 'Pixiv created' });
+      .expect({ status: 201, message: 'Pixiv added' });
   });
 
-  describe('Get pixiv by field Content', () => {
-    it('No paginated, should return a not empty array', async () => {
-      const result = await api.get('/api/pixiv/content/').send(body);
-      expect(result.status).toBe(200);
-      expect(result.headers['content-type']).toMatch(/application\/json/);
-      expect(result.body).not.toHaveLength(0);
-    });
-
-    it('Paginated, should have field \'results\' and return a not empty array', async () => {
-      const result = await api.get('/api/pixiv/content/')
-        .query({
-          page: 1,
-          limit: 10,
-        })
-        .send(body);
-      expect(result.status).toBe(200);
-      expect(result.headers['content-type']).toMatch(/application\/json/);
-      expect(result.body).toHaveProperty('results');
-      expect(result.body.results).not.toHaveLength(0);
-    });
+  it('Get pixiv by field Content, should have field \'results\' and return a not empty array', async () => {
+    const result = await api.get('/api/pixiv/content/')
+      .query({
+        page: 1,
+        limit: 10,
+      })
+      .send(body);
+    expect(result.status).toBe(200);
+    expect(result.headers['content-type']).toMatch(/application\/json/);
+    expect(result.body).toHaveProperty('results');
+    expect(result.body.results).not.toHaveLength(0);
   });
 
   it('Get pixiv by idPixiv, should return a a object with all fields', async () => {
@@ -64,13 +55,13 @@ describe('Pixiv endpoints with 200 status code', () => {
 
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
-    expect(result.body).toHaveProperty('_id');
-    expect(result.body).toHaveProperty('idPixiv');
-    expect(result.body).toHaveProperty('pixivName');
-    expect(result.body).toHaveProperty('Content');
-    expect(result.body).toHaveProperty('Quality');
-    expect(result.body).toHaveProperty('Favorite');
-    expect(result.body).toHaveProperty('Link');
+    expect(result.body.data[0]).toHaveProperty('_id');
+    expect(result.body.data[0]).toHaveProperty('idPixiv');
+    expect(result.body.data[0]).toHaveProperty('pixivName');
+    expect(result.body.data[0]).toHaveProperty('Content');
+    expect(result.body.data[0]).toHaveProperty('Quality');
+    expect(result.body.data[0]).toHaveProperty('Favorite');
+    expect(result.body.data[0]).toHaveProperty('Link');
   });
 
   it('Update pixiv, should return a object with message', async () => {
@@ -88,6 +79,6 @@ describe('Pixiv endpoints with 200 status code', () => {
       .send(updatePixiv)
       .expect(200)
       .expect('Content-Type', /application\/json/)
-      .expect({ message: 'Pixiv updated' });
+      .expect({ status: 200, message: 'Pixiv updated' });
   });
 });

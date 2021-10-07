@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
 const Pixiv = require('../models/pixivModel');
 const { pixivSchema, pixivContent } = require('../utils/validationSchemas');
-const paginated = require('../utils/paginated');
+const paginate = require('../utils/paginate');
+const logger = require('../utils/logger');
 
-class PixivController {
+const PixivController = {
   async getAll(req, res, next) {
     try {
       let { page, limit } = req.query;
@@ -20,12 +21,13 @@ class PixivController {
       const pixiv = await Pixiv.find().limit(limit).skip(skipIndex);
       const pixivCount = await getTotalDocuments(Pixiv);
 
-      const results = paginated(page, limit, skipIndex, endIndex, pixivCount, pixiv);
+      const results = paginate(page, limit, skipIndex, endIndex, pixivCount, pixiv);
       return res.status(200).json(results);
     } catch (error) {
+      if (process.env.NODE_ENV !== 'test') logger.error(error);
       next(error);
     }
-  }
+  },
 
   async getByIdPixiv(req, res, next) {
     const { idPixiv } = req.params;
@@ -33,23 +35,16 @@ class PixivController {
       if (!Number(idPixiv)) throw createErrors.BadRequest(`Bad Request. '${idPixiv}' is not a valid param`);
       const pixiv = await Pixiv.find({ idPixiv });
       if (!pixiv) return res.status(200).json([]);
-      return res.status(200).json(pixiv);
+      return res.status(200).json({ status: 200, data: pixiv });
     } catch (error) {
+      if (process.env.NODE_ENV !== 'test') logger.error(error);
       next(error);
     }
-  }
+  },
 
   async getByContent(req, res, next) {
     try {
       const { Content: content } = await pixivContent.validateAsync(req.body);
-
-      if (Object.keys(req.query).length === 0) {
-        const pixiv = await Pixiv.find({ Content: { $regex: content, $options: 'i' } }).sort({ _id: 'desc' });
-
-        if (!pixiv) return res.status(200).json([]);
-        return res.status(200).json(pixiv);
-      }
-
       let { page, limit } = req.query;
 
       if (!page || !limit) throw createErrors.BadRequest('Must include query params');
@@ -64,25 +59,27 @@ class PixivController {
       const pixiv = await Pixiv.find(query).limit(limit).skip(skip);
       const pixivCount = await getCountDocuments(Pixiv, query);
 
-      const results = paginated(page, limit, startIndex, endIndex, pixivCount, pixiv);
+      const results = paginate(page, limit, startIndex, endIndex, pixivCount, pixiv);
       return res.status(200).json(results);
     } catch (error) {
       if (error.isJoi === true) error.status = 422;
+      if (process.env.NODE_ENV !== 'test') logger.error(error);
       next(error);
     }
-  }
+  },
 
   async addPixiv(req, res, next) {
     try {
       const result = await pixivSchema.validateAsync(req.body);
       const newPixiv = Pixiv(result);
       await newPixiv.save();
-      return res.status(201).json({ message: 'Pixiv created' });
+      return res.status(201).json({ status: 201, message: 'Pixiv added' });
     } catch (error) {
       if (error.isJoi === true) error.status = 422;
+      if (process.env.NODE_ENV !== 'test') logger.error(error);
       next(error);
     }
-  }
+  },
 
   async updatePixiv(req, res, next) {
     const { id } = req.params;
@@ -90,12 +87,13 @@ class PixivController {
       if (!mongoose.Types.ObjectId.isValid(id)) throw createErrors.BadRequest(`Bad request. ${id} is not a valid param`);
       const result = await pixivSchema.validateAsync(req.body);
       await Pixiv.findByIdAndUpdate(id, result, { new: true });
-      return res.status(200).json({ message: 'Pixiv updated' });
+      return res.status(200).json({ status: 200, message: 'Pixiv updated' });
     } catch (error) {
       if (error.isJoi === true) error.status = 422;
+      if (process.env.NODE_ENV !== 'test') logger.error(error);
       next(error);
     }
-  }
-}
+  },
+};
 
-module.exports = new PixivController();
+module.exports = PixivController;
