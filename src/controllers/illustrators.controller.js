@@ -1,7 +1,7 @@
 const createErrors = require('http-errors');
 const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
-const { illustratorName, illustratorSchema, illustratorSource } = require('../utils/validationSchemas');
+const { illustratorName, illustratorSchema } = require('../utils/validationSchemas');
 const Illustrators = require('../models/illustratorsModel');
 const paginate = require('../utils/paginate');
 const logger = require('../utils/logger');
