@@ -34,7 +34,6 @@ const PixivController = {
     try {
       if (!Number(idPixiv)) throw createErrors.BadRequest(`Bad Request. '${idPixiv}' is not a valid param`);
       const pixiv = await Pixiv.find({ idPixiv });
-      if (!pixiv) return res.status(200).json([]);
       return res.status(200).json({ status: 200, data: pixiv });
     } catch (error) {
       if (process.env.NODE_ENV !== 'test') logger.error(error);
@@ -44,12 +43,13 @@ const PixivController = {
 
   async getByContent(req, res, next) {
     try {
-      const { Content: content } = await pixivContent.validateAsync(req.body);
       let { page, limit } = req.query;
 
       if (!page || !limit) throw createErrors.BadRequest('Must include query params');
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
+
+      const { Content: content } = await pixivContent.validateAsync(req.body);
 
       const skip = (page - 1) * limit;
       const startIndex = skip;

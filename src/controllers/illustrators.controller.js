@@ -1,7 +1,7 @@
 const createErrors = require('http-errors');
 const mongoose = require('mongoose');
 const { getTotalDocuments, getCountDocuments } = require('../utils/customQueries');
-const { illustratorName, illustratorSchema } = require('../utils/validationSchemas');
+const { illustratorName, illustratorSchema, illustratorSource } = require('../utils/validationSchemas');
 const Illustrators = require('../models/illustratorsModel');
 const paginate = require('../utils/paginate');
 const logger = require('../utils/logger');
@@ -32,13 +32,14 @@ const IllustratorsController = {
 
   async getByName(req, res, next) {
     try {
-      const { Name: name } = await illustratorName.validateAsync(req.body);
       let { page, limit } = req.query;
-      const query = { Name: { $regex: name } };
 
       if (!page || !limit) throw createErrors.BadRequest('Must include query params');
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
+
+      const { Name: name } = await illustratorName.validateAsync(req.body);
+      const query = { Name: { $regex: name } };
 
       const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
@@ -50,6 +51,7 @@ const IllustratorsController = {
 
       return res.status(200).json(results);
     } catch (err) {
+      if (err.isJoi === true) err.status = 422;
       if (process.env.NODE_ENV !== 'test') logger.error(err);
       next(err);
     }
@@ -58,7 +60,6 @@ const IllustratorsController = {
   async getBySource(req, res, next) {
     try {
       const { source } = req.params;
-      const query = { Source: source };
       let { page, limit } = req.query;
 
       if (source === '') throw createErrors.BadRequest(`Bad Request. ${source} is not a valid param.`);
@@ -67,6 +68,7 @@ const IllustratorsController = {
       page = parseInt(page, 10);
       limit = parseInt(limit, 10);
 
+      const query = { Source: source };
       const skipIndex = (page - 1) * limit;
       const endIndex = page * limit;
 

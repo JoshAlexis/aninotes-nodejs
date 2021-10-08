@@ -1,14 +1,15 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const illustratorsModel = require('../models/illustratorsModel');
-const { illustratorsItems, newIllustrator } = require('../utils/testingData');
+const { illustratorsTestingData } = require('./testingData');
+const { illustrators } = require('../utils/endpoints');
 const app = require('../app');
 
 const api = supertest(app);
 
 beforeEach(async () => {
   await illustratorsModel.deleteMany({});
-  await illustratorsModel.insertMany(illustratorsItems);
+  await illustratorsModel.insertMany(illustratorsTestingData.illustratorsItems);
   jest.setTimeout(10000);
 });
 
@@ -18,23 +19,22 @@ afterAll(async () => {
 
 describe('Illustrators endpoints with 200 status code', async () => {
   it('Get illustrators, should return an object where field \'results\' is not empty', async () => {
-    const result = await api.get('/api/illustrators/').query({
+    const result = await api.get(illustrators.GET_ILLUSTRATORS).query({
       page: 1,
       limit: 10,
     });
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
-    expect(result.body.results).toHaveLength(illustratorsItems.length);
+    expect(result.body.results).toHaveLength(illustratorsTestingData.illustratorsItems.length);
   });
 
   it('Get illustrators by Name, should return an object where field \'results\' is not empty', async () => {
-    const name = 'DM-iTH';
-    const result = await api.get('/api/illustrators/name/')
+    const result = await api.get(illustrators.GET_ILLUSTRATOR_BY_NAME)
       .query({
         page: 1,
         limit: 10,
       })
-      .send({ Name: name });
+      .send({ Name: illustratorsTestingData.illustratorName });
 
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
@@ -46,30 +46,24 @@ describe('Illustrators endpoints with 200 status code', async () => {
 
   it('Add illustrator, should return an object', async () => {
     await api
-      .post('/api/illustrators/add')
-      .send(newIllustrator)
+      .post(illustrators.ADD_NEW_ILLUSTRATOR)
+      .send(illustratorsTestingData.newIllustrator)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .expect({ status: 201, message: 'Illustrator added' });
   });
 
   it('Update illustrator, should return an object', async () => {
-    const updateIllustrator = {
-      Name: 'DM-iTH',
-      Source: 'Artstation',
-      Content: 'OC',
-      Comments: 'R18',
-    };
-    const result = await api.get('/api/illustrators/name/')
+    const result = await api.get(illustrators.GET_ILLUSTRATOR_BY_NAME)
       .query({
         page: 1,
         limit: 10,
       })
-      .send({ Name: updateIllustrator.Name });
+      .send({ Name: illustratorsTestingData.updateIllustrator.Name });
     const { _id } = result.body.results[0];
     await api
-      .put(`/api/illustrators/update/${_id}`)
-      .send(updateIllustrator)
+      .put(`${illustrators.UPDATE_ILLUSTRATOR}${_id}`)
+      .send(illustratorsTestingData.updateIllustrator)
       .expect(200)
       .expect('Content-Type', /application\/json/)
       .expect({ status: 200, message: 'Illustrator updated' });

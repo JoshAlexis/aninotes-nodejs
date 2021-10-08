@@ -1,14 +1,15 @@
 const supertest = require('supertest');
 const mongoose = require('mongoose');
 const pixivModel = require('../models/pixivModel');
-const { pixivItems, newPixiv, body } = require('../utils/testingData');
+const { pixivTestingData } = require('./testingData');
+const { pixiv } = require('../utils/endpoints');
 const app = require('../app');
 
 const api = supertest(app);
 
 beforeAll(async () => {
   await pixivModel.deleteMany({});
-  await pixivModel.insertMany(pixivItems);
+  await pixivModel.insertMany(pixivTestingData.pixivItems);
   jest.setTimeout(10000);
 });
 
@@ -18,31 +19,31 @@ afterAll(async () => {
 
 describe('Pixiv endpoints with 200 status code', () => {
   it('Get pixiv, should return an object where field \'results\' is not empty', async () => {
-    const result = await api.get('/api/pixiv/').query({
+    const result = await api.get(pixiv.GET_PIXIV).query({
       page: 1,
       limit: 10,
     });
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
-    expect(result.body.results).toHaveLength(pixivItems.length);
+    expect(result.body.results).toHaveLength(pixivTestingData.pixivItems.length);
   });
 
   it('Create pixiv, should return object with message', async () => {
     await api
-      .post('/api/pixiv/')
-      .send(newPixiv)
+      .post(pixiv.ADD_NEW_PIXIV)
+      .send(pixivTestingData.newPixiv)
       .expect(201)
       .expect('Content-Type', /application\/json/)
       .expect({ status: 201, message: 'Pixiv added' });
   });
 
   it('Get pixiv by field Content, should have field \'results\' and return a not empty array', async () => {
-    const result = await api.get('/api/pixiv/content/')
+    const result = await api.get(pixiv.GET_PIXIV_BY_CONTENT)
       .query({
         page: 1,
         limit: 10,
       })
-      .send(body);
+      .send(pixivTestingData.contentBody);
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
     expect(result.body).toHaveProperty('results');
@@ -50,8 +51,7 @@ describe('Pixiv endpoints with 200 status code', () => {
   });
 
   it('Get pixiv by idPixiv, should return a a object with all fields', async () => {
-    const idPixiv = '14764274';
-    const result = await api.get(`/api/pixiv/idpixiv/${idPixiv}`);
+    const result = await api.get(`${pixiv.GET_PIXIV_BY_IDPIXIV}${pixivTestingData.idPixiv}`);
 
     expect(result.status).toBe(200);
     expect(result.headers['content-type']).toMatch(/application\/json/);
@@ -65,18 +65,9 @@ describe('Pixiv endpoints with 200 status code', () => {
   });
 
   it('Update pixiv, should return a object with message', async () => {
-    const updatePixiv = {
-      idPixiv: '5121919',
-      pixivName: 'moda',
-      Content: 'OC, girls, palid',
-      Quality: '++++',
-      Favorite: 'FF+',
-      Link: 'https://www.pixiv.net/en/users/5121919',
-    };
-    const _id = '60627879c0b5822e6427cdef';
     await api
-      .put(`/api/pixiv/${_id}`)
-      .send(updatePixiv)
+      .put(`${pixiv.UPDATE_PIXIV}${pixivTestingData._id}`)
+      .send(pixivTestingData.updatePixiv)
       .expect(200)
       .expect('Content-Type', /application\/json/)
       .expect({ status: 200, message: 'Pixiv updated' });
